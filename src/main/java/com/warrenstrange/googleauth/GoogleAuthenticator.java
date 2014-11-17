@@ -68,6 +68,8 @@ import java.util.logging.Logger;
  */
 public final class GoogleAuthenticator implements IGoogleAuthenticator {
 
+    ICredentialRepository repository;
+
     /**
      * Minimum validation window size.
      */
@@ -318,8 +320,13 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
 
         GoogleAuthenticatorKey key = createCredentials();
 
-        ICredentialRepository repository = getValidCredentialRepository();
-        repository.saveUserCredentials(
+        ICredentialRepository workingRepository;
+        if (repository == null) {
+            workingRepository = getValidCredentialRepository();
+        } else {
+            workingRepository = repository;
+        }
+        workingRepository.saveUserCredentials(
                 userName,
                 key.getKey(),
                 key.getVerificationCode(),
@@ -455,9 +462,14 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
     public boolean authorizeUser(String userName, int verificationCode)
             throws GoogleAuthenticatorException {
 
-        ICredentialRepository repository = getValidCredentialRepository();
+        ICredentialRepository workingRepository;
+        if (repository == null) {
+            workingRepository = getValidCredentialRepository();
+        } else {
+            workingRepository = repository;
+        }
 
-        return authorize(repository.getSecretKey(userName), verificationCode);
+        return authorize(workingRepository.getSecretKey(userName), verificationCode);
     }
 
     @Override
@@ -467,10 +479,15 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
             int verificationCode,
             int window)
             throws GoogleAuthenticatorException {
-        ICredentialRepository repository = getValidCredentialRepository();
+        ICredentialRepository workingRepository;
+        if (repository == null) {
+            workingRepository = getValidCredentialRepository();
+        } else {
+            workingRepository = repository;
+        }
 
         return authorize(
-                repository.getSecretKey(userName),
+                workingRepository.getSecretKey(userName),
                 verificationCode,
                 window);
     }
@@ -544,5 +561,13 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
                 verificationCode,
                 new Date().getTime(),
                 window);
+    }
+
+    public ICredentialRepository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(ICredentialRepository repository) {
+        this.repository = repository;
     }
 }
