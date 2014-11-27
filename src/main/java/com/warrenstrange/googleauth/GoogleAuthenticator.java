@@ -68,6 +68,9 @@ import java.util.logging.Logger;
  */
 public final class GoogleAuthenticator implements IGoogleAuthenticator {
 
+    /**
+     * Credential repository.
+     */
     ICredentialRepository repository;
 
     /**
@@ -173,6 +176,11 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
                 RANDOM_NUMBER_ALGORITHM,
                 RANDOM_NUMBER_ALGORITHM_PROVIDER);
 
+    }
+
+    public GoogleAuthenticator(ICredentialRepository repository) {
+        super();
+        this.repository = repository;
     }
 
     /**
